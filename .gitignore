@@ -1,0 +1,12 @@
+# Cache/byte-compiled
+__pycache__/
+*.pyc
+
+# Packaging
+*.egg-info/
+
+# Sandbox folder for development
+/sandbox
+
+# Virtualenv
+env
