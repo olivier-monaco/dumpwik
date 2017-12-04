@@ -76,7 +76,7 @@ def create_dump(config, database, filename):
     workfile = filename + '.running'
     try:
         wfh = open(workfile, 'w')
-    except PermissionError:
+    except IOError as e:
         raise Exception('Unable to open temporary file "{0}"'.format(workfile))
 
     try:
@@ -92,10 +92,11 @@ def create_dump(config, database, filename):
 
 
 def backup(config):
-    excludes = config['exclude']
+    excludes = config['exclude'] if 'exclude' in config else []
+    includes = config['include'] if 'include' in config else []
+
     excludes.append('information_schema')
     excludes.append('performance_schema')
-    includes = config['include']
 
     logging.info('Running MySQL backup named {0}'.format(config['name']))
     logging.debug('Connecting as {0}@{1}'
