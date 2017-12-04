@@ -5,6 +5,7 @@ import logging
 
 from .backup import backup as do_backup
 from .prune import prune as do_prune
+from ._version import version as __version__
 
 
 def load_config(filename):
@@ -65,10 +66,46 @@ def load_config(filename):
     help='Set log level to DEBUG'
 )
 @click.option(
+    '--error',
+    'loglevel',
+    flag_value='ERROR',
+    help='Set log level to ERROR'
+)
+@click.option(
     '--info ',
     'loglevel',
     flag_value='INFO',
     help='Set log level to INFO'
+)
+@click.option(
+    '--log-file',
+    'logfile',
+    help='Set log file filename'
+)
+@click.option(
+    '--log-file-debug',
+    'logfilelevel',
+    flag_value='DEBUG',
+    help='Set log file log level to DEBUG'
+)
+@click.option(
+    '--log-file-error',
+    'logfilelevel',
+    flag_value='ERROR',
+    help='Set log file log level to ERROR'
+)
+@click.option(
+    '--log-file-info ',
+    'logfilelevel',
+    flag_value='INFO',
+    help='Set log file log level to INFO'
+)
+@click.option(
+    '--log-file-warning',
+    'logfilelevel',
+    flag_value='WARNING',
+    default=True,
+    help='Set log file log level to WARNING (default)'
 )
 @click.option(
     '--warning',
@@ -77,11 +114,8 @@ def load_config(filename):
     default=True,
     help='Set log level to WARNING (default)'
 )
-@click.option(
-    '--error',
-    'loglevel',
-    flag_value='ERROR',
-    help='Set log level to ERROR'
+@click.version_option(
+    version=__version__
 )
 @click.pass_context
 def main(ctx, **kwargs):
@@ -90,10 +124,18 @@ def main(ctx, **kwargs):
     fmt = logging.Formatter(fmt)
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
+
     console = logging.StreamHandler()
     console.setFormatter(fmt)
     console.setLevel(level)
     root.addHandler(console)
+
+    if kwargs['logfile'] is not None:
+        fh = logging.FileHandler(kwargs['logfile'])
+        fh.setFormatter(fmt)
+        level = eval('logging.' + kwargs['logfilelevel'])
+        fh.setLevel(level)
+        root.addHandler(fh)
 
     ctx.obj = load_config(kwargs['config'])
 
