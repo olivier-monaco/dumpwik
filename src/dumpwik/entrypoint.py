@@ -1,7 +1,12 @@
 import click
-import collections
 import json
 import logging
+
+from sys import version_info
+if version_info < (3, 3):
+  from collections import Mapping
+else:
+  from collections.abc import Mapping
 
 from .backup import backup as do_backup
 from .prune import prune as do_prune
@@ -23,7 +28,7 @@ def load_config(filename):
 
     def rupdate(d, u):
         for k, v in u.items():
-            if isinstance(v, collections.Mapping):
+            if isinstance(v, Mapping):
                 d[k] = rupdate(d.get(k, {}), v)
             else:
                 d[k] = v
